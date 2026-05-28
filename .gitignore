@@ -1,0 +1,19 @@
+# Dipendenze
+node_modules/
+
+# Output di build
+dist/
+
+# Log
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+
+# Preferenze personali Claude Code (per-sviluppatore, non condivise)
+CLAUDE.local.md
+
+# Artefatti di debug Playwright (snapshot, console log, screenshot)
+.playwright-mcp/
+verifica-*.png

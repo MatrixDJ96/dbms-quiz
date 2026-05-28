@@ -1,0 +1,122 @@
+{
+  "_comment": "Version-controlled. All entries here apply to every team member. Personal overrides go in .claude/settings.local.json (gitignored) or ~/.claude/settings.json (user-level).",
+  "_docs": "https://code.claude.com/docs/en/permissions",
+
+  "permissions": {
+    "_comment_deny": "Block sensitive reads, all writes to env/secrets, and the *actually dangerous* Bash patterns Claude could emit. Pattern syntax: https://code.claude.com/docs/en/permissions",
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.*)",
+      "Read(**/secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Read(**/*.p12)",
+      "Read(**/id_rsa*)",
+      "Read(**/.git/**)",
+
+      "Edit(**/node_modules/**)",
+      "Write(**/node_modules/**)",
+      "Edit(**/.venv/**)",
+      "Write(**/.venv/**)",
+      "Edit(**/venv/**)",
+      "Write(**/venv/**)",
+      "Edit(**/vendor/**)",
+      "Write(**/vendor/**)",
+      "Edit(**/dist/**)",
+      "Write(**/dist/**)",
+      "Edit(**/build/**)",
+      "Write(**/build/**)",
+      "Edit(**/.next/**)",
+      "Write(**/.next/**)",
+      "Edit(**/.nuxt/**)",
+      "Write(**/.nuxt/**)",
+      "Edit(**/target/**)",
+      "Write(**/target/**)",
+      "Edit(**/__pycache__/**)",
+      "Write(**/__pycache__/**)",
+      "Edit(**/coverage/**)",
+      "Write(**/coverage/**)",
+      "Edit(**/*.min.js)",
+      "Write(**/*.min.js)",
+      "Edit(**/*.min.css)",
+      "Write(**/*.min.css)",
+      "Edit(**/*.map)",
+      "Write(**/*.map)",
+
+      "Write(**/.env)",
+      "Write(**/.env.*)",
+      "Write(**/secrets/**)",
+      "Edit(**/secrets/**)",
+
+      "Bash(rm -rf *)",
+      "Bash(rm -rf .)",
+      "Bash(rm -rf ./*)",
+      "Bash(rm -rf ~)",
+      "Bash(rm -rf /)",
+      "Bash(rm -rf /*)",
+      "Bash(sudo *)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -fd*)",
+      "Bash(git checkout -- *)",
+      "Bash(git restore -- *)",
+      "Bash(git branch -D*)",
+      "Bash(curl * | sh)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(wget * | bash)"
+    ],
+
+    "_comment_allow": "Pre-approve safe project-scoped commands so the agent doesn't ask every time. Project-specific; edit per repo. Suggestion: run `/permissions` after a few sessions to see what you've been approving anyway, then move it here.",
+    "allow": [
+      "Bash(npm install)",
+      "Bash(npm ci)",
+      "Bash(npm run:*)"
+    ]
+  },
+
+  "hooks": {
+    "_comment": "Templates in .claude/hooks/. Disable any block by commenting it out. Docs: https://code.claude.com/docs/en/hooks-guide",
+
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-tool-use.sh"
+          }
+        ]
+      }
+    ],
+
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/stop.sh"
+          }
+        ]
+      }
+    ]
+  },
+
+  "_skill_paths": [
+    ".claude/skills"
+  ]
+}

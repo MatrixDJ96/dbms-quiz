@@ -1,0 +1,4 @@
+# Session logs (often contain pasted file contents, env values, secrets) - never versioned
+sessions/
+# Per-machine permission overrides
+settings.local.json
