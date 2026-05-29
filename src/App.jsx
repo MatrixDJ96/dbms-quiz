@@ -245,7 +245,7 @@ export default function App() {
 
   return <div className="app"><Background intensity={intensity} /><div className="scan" aria-hidden="true" />
     <main className="shell">
-      <header className="top card"><div><p className="eyebrow">Sfida a tempo</p><h1>DB Survivor</h1></div><div className="actions"><button type="button" aria-pressed={sound} onClick={() => setSound(!sound)}>{sound ? 'Audio ON' : 'Audio OFF'}</button><button type="button" className="primary" onClick={start}>{phase === 'intro' ? 'Inizia' : 'Ricomincia'}</button></div></header>
+      <header className="top card"><div><p className="eyebrow">Sfida a tempo</p><h1>Quiz DBMS</h1></div><div className="actions"><button type="button" aria-pressed={sound} onClick={() => setSound(!sound)}>{sound ? 'Audio ON' : 'Audio OFF'}</button><button type="button" className="primary" onClick={start}>{phase === 'intro' ? 'Inizia' : 'Ricomincia'}</button></div></header>
       <section className="hud"><Stat label="Integrità" value={`${hp} HP`} pct={hp} /><Stat label="Tempo" value={formatTime(time)} pct={(time / maxTime) * 100} /><Stat label="Score" value={score} sub={`Combo ×${combo}`} /><Stat label="Domande" value={`${run.length ? index + 1 : 0}/${TOTAL}`} sub={`OK ${correct} · Malus ${malus} · Bonus ${bonus}`} /></section>
       <section className="grid"><article className="card board" ref={boardRef}>
         {phase === 'intro' && <div className="intro"><h2>Rispondi, sopravvivi, non farti fregare.</h2><p>{TOTAL} domande di difficoltà crescente. Rispondi, gestisci HP e tempo, e occhio agli eventi a sorpresa.</p><button type="button" className="primary big" onClick={start}>Inizia</button></div>}

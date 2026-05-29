@@ -1,4 +1,4 @@
-# DB Survivor
+# Quiz DBMS
 
 > **Per Claude Code**: questo file è caricato a ogni sessione. Tienilo snello (<300 righe).
 > Le preferenze personali non condivise vanno in `CLAUDE.local.md` (già in `.claude/.gitignore` via `settings.local.json`; aggiungilo a un `.gitignore` di root se inizializzi git).

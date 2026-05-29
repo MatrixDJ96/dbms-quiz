@@ -1,6 +1,6 @@
-# DB Survivor
+# Quiz DBMS
 
-Quiz di sopravvivenza sui database (DBMS) — progetto React/Vite, giocabile nel browser.
+Quiz sui database (DBMS) — progetto React/Vite, giocabile nel browser.
 
 **Gioca online:** https://matrixdj96.github.io/dbms-quiz/
 
