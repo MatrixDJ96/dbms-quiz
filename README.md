@@ -1,6 +1,8 @@
-# Maturità DBMS Chaos Mode
+# DB Survivor
 
-Progetto React/Vite compilabile e condivisibile.
+Quiz di sopravvivenza sui database (DBMS) — progetto React/Vite, giocabile nel browser.
+
+**Gioca online:** https://matrixdj96.github.io/dbms-quiz/
 
 ## Requisiti
 

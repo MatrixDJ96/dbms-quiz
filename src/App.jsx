@@ -1,54 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-
-const RAW_QUESTIONS = [
-  ['DBMS','Facile','Quale componente consente a più utenti di lavorare sugli stessi dati riducendo conflitti e inconsistenze?',['Il sistema di gestione della concorrenza del DBMS','Il colore dell’interfaccia','La sola estensione .sql','La normalizzazione automatica del browser'],'Il DBMS gestisce accessi concorrenti tramite transazioni, lock, isolamento e controllo della concorrenza.'],
-  ['DBMS','Media','Quale proprietà ACID garantisce che una transazione confermata sopravviva a un crash successivo?',['Durabilità','Atomicità','Isolamento','Minimalità'],'La durabilità assicura che gli effetti di una transazione confermata siano permanenti.'],
-  ['DBMS','Difficile','Due transazioni aggiornano lo stesso saldo. Senza isolamento adeguato, una modifica può sovrascrivere l’altra. Che anomalia descrive meglio il caso?',['Lost update','Dipendenza parziale','Violazione della 1FN','Natural join implicito'],'Il lost update avviene quando un aggiornamento concorrente cancella o sovrascrive un altro aggiornamento.'],
-  ['DBMS','Infame','Se sostituisci un indice B-tree con una struttura hash senza modificare schema logico né query applicative, quale proprietà stai sfruttando soprattutto?',['Indipendenza fisica dei dati','Integrità referenziale','Normalizzazione in BCNF','Specializzazione IS-A'],'Stai cambiando un dettaglio fisico di accesso, non la struttura logica visibile alle applicazioni.'],
-  ['Schema/Istanza','Media','Quale coppia descrive correttamente schema e istanza?',['Schema = struttura; istanza = contenuto in un certo momento','Schema = dati correnti; istanza = vincoli permanenti','Schema e istanza sono sinonimi','Lo schema cambia a ogni INSERT'],'Lo schema è relativamente stabile; l’istanza cambia con inserimenti, modifiche e cancellazioni.'],
-  ['Progettazione','Difficile','Correggere una cardinalità da 1:N a N:M perché l’analisi del dominio era errata significa correggere quale livello?',['Concettuale','Fisico','Di indicizzazione','Solo sintattico SQL'],'Le cardinalità descrivono regole del dominio, quindi appartengono al modello concettuale.'],
-  ['Progettazione','Infame','Quale elemento puzza di errore se lo trovi in un modello concettuale E-R?',['Indice B-tree sull’attributo Cognome','Entità Studente','Associazione Sostiene tra Studente ed Esame','Cardinalità minima e massima'],'Un indice è una scelta fisica o prestazionale, non concettuale.'],
-  ['Modelli logici','Facile','Quale modello logico rappresenta naturalmente strutture padre-figlio ad albero?',['Gerarchico','Relazionale','A oggetti','Colonnare'],'Il modello gerarchico organizza i record in una struttura ad albero.'],
-  ['Modelli logici','Difficile','Quale modello NoSQL è concettualmente più vicino a nodi e archi, quindi utile per reti sociali o percorsi?',['Grafo','Chiave-valore puro','File sequenziale','Gerarchico rigido'],'Il modello a grafo rappresenta entità come nodi e relazioni come archi.'],
-  ['Modelli logici','Infame','Quale frase è meno sbagliata sul confronto relazionale/NoSQL?',['La scelta dipende da requisiti, coerenza, schema, accessi e scalabilità','NoSQL batte sempre il relazionale','Il relazionale non scala mai','NoSQL impedisce la ridondanza'],'Non esiste un vincitore assoluto: contano carico, modello dati, consistenza e query richieste.'],
-  ['E-R','Facile','Nel modello E-R, Studente è entità e “Mario Rossi, matricola 123” è:',['Istanza dell’entità','Attributo composto','Vincolo interrelazionale','Cardinalità massima'],'L’entità è la classe; il singolo oggetto reale rappresentato è un’istanza.'],
-  ['E-R','Media','Un attributo derivato è un attributo che:',['Può essere calcolato da altri dati','È sempre chiave primaria','Non ha dominio','È obbligatoriamente multivalore'],'Per esempio l’età può essere derivata dalla data di nascita.'],
-  ['E-R','Difficile','Una relazione N:M Iscrizione tra Studente e Corso, con attributo DataIscrizione, nel relazionale diventa tipicamente:',['Tabella associativa con le due foreign key e DataIscrizione','Foreign key in Studente e basta','Foreign key in Corso e basta','Colonna multivalore dentro Studente'],'La tabella ponte rappresenta l’associazione e conserva anche gli attributi propri dell’associazione.'],
-  ['E-R','Infame','In una 1:1 Persona-Passaporto, con partecipazione totale di Passaporto e parziale di Persona, dove conviene mettere la FK per minimizzare NULL?',['In Passaporto verso Persona, spesso con UNIQUE','In Persona verso Passaporto, sempre nullable','In entrambe obbligatoriamente','In una tabella ponte sempre necessaria'],'Il lato a partecipazione totale è più naturale: ogni passaporto deve riferire una persona. UNIQUE mantiene l’uno-a-uno.'],
-  ['Gerarchie','Infame','In una gerarchia IS-A totale e disgiunta, quale frase è corretta?',['Ogni istanza della superclasse appartiene ad almeno una sottoclasse e al massimo a una','Ogni istanza può appartenere a più sottoclassi','Possono esistere istanze solo nella superclasse','Non si può tradurre in schema relazionale'],'Totale = tutte coperte; disgiunta = non sovrapposte.'],
-  ['Relazionale','Facile','Una tupla di una relazione corrisponde di solito a:',['Una riga','Una colonna','Un dominio','Un DBMS'],'Nella rappresentazione tabellare, le tuple sono righe.'],
-  ['Relazionale','Media','Il grado di una relazione e la sua cardinalità indicano rispettivamente:',['Numero di attributi e numero di tuple','Numero di tuple e numero di attributi','Numero di chiavi e numero di vincoli','Numero di FK e numero di PK'],'Grado = colonne/attributi; cardinalità = righe/tuple.'],
-  ['Relazionale','Difficile','Quale proprietà rende una chiave candidata “minimale”?',['Nessun suo sottoinsieme identifica ancora univocamente le tuple','È sempre composta da un solo attributo','Non può essere usata come primary key','Deve essere una foreign key'],'Se togli un attributo e resta identificante, allora non era minimale.'],
-  ['Relazionale','Infame','Una superchiave differisce da una chiave candidata perché:',['Può contenere attributi superflui','Non identifica le tuple','È sempre esterna','È vietata in SQL'],'La chiave candidata è una superchiave minimale; una superchiave può non esserlo.'],
-  ['Vincoli','Facile','NOT NULL impedisce:',['L’assenza di valore in un attributo','I duplicati tra righe','Ogni join','La cancellazione della tabella'],'NOT NULL richiede che l’attributo abbia un valore.'],
-  ['Vincoli','Difficile','Quale vincolo è interrelazionale?',['Una foreign key tra Ordine.IdCliente e Cliente.IdCliente','CHECK Prezzo > 0','NOT NULL su Cognome','UNIQUE su Email'],'I vincoli referenziali coinvolgono almeno due relazioni.'],
-  ['Vincoli','Infame','Se una foreign key è nullable, cosa significa correttamente?',['Il riferimento può essere assente, ma se presente deve essere valido','Il riferimento può puntare a tuple inesistenti','La chiave primaria referenziata può duplicarsi','Il vincolo referenziale è disattivato'],'NULL indica assenza di riferimento; i valori non nulli devono rispettare l’integrità referenziale.'],
-  ['Normalizzazione','Facile','La normalizzazione serve principalmente a ridurre:',['Ridondanza e anomalie','Il numero di backup','La necessità di SQL','La presenza di chiavi primarie'],'Normalizzare aiuta a evitare duplicazioni inutili e anomalie operative.'],
-  ['Normalizzazione','Difficile','In Esami(Matricola, CodCorso, NomeStudente, TitoloCorso, Voto), con PK(Matricola, CodCorso), NomeStudente dipende solo da Matricola. Che problema è?',['Dipendenza parziale, violazione della 2FN','Dipendenza transitiva, violazione della 3FN','Violazione automatica della 1FN','Violazione di integrità referenziale'],'Un attributo non chiave dipende solo da parte della chiave composta.'],
-  ['Normalizzazione','Infame','Se in R(A,B,C) valgono A → B e B → A, puoi concludere che A è superchiave di R?',['No, non necessariamente: dovrebbe determinare anche C','Sì, sempre','Sì, se B è testuale','No, perché le dipendenze inverse sono vietate'],'Per essere superchiave, A deve determinare tutti gli attributi della relazione.'],
-  ['Algebra','Facile','σ_{Età > 18}(Studenti) indica:',['Selezione di tuple','Proiezione di colonne','Ridenominazione','Divisione'],'La selezione filtra righe in base a una condizione.'],
-  ['Algebra','Media','Nel modello insiemistico, π_Cognome(Studenti) restituisce:',['I cognomi senza duplicati','Le tuple complete','Solo righe con Cognome NULL','Il prodotto cartesiano dei cognomi'],'La proiezione seleziona attributi ed elimina duplicati nel modello insiemistico.'],
-  ['Algebra','Infame','Perché il natural join può essere traditore?',['Perché unisce automaticamente attributi con lo stesso nome anche se semanticamente non c’entrano','Perché restituisce sempre il prodotto cartesiano puro','Perché non può mai eliminare colonne duplicate','Perché funziona solo con chiavi artificiali'],'Nomi uguali non garantiscono significati uguali. È una trappola molto reale.'],
-  ['SQL','Facile','Quale funzione SQL calcola la media?',['AVG','SUM','COUNT','GROUP'],'AVG restituisce la media dei valori non nulli dell’espressione.'],
-  ['SQL','Media','GROUP BY Reparto in una query sui dipendenti crea:',['Un gruppo di righe per ogni reparto','Una tabella fisica per reparto','Un indice per reparto','Una foreign key automatica'],'GROUP BY partiziona le righe in gruppi logici.'],
-  ['SQL','Difficile','Per mostrare solo i gruppi con COUNT(*) > 3, quale clausola è corretta?',['HAVING COUNT(*) > 3','WHERE COUNT(*) > 3','FROM COUNT(*) > 3','JOIN COUNT(*) > 3'],'Le condizioni sugli aggregati vanno in HAVING.'],
-  ['SQL','Infame','Dopo un LEFT JOIN tra A e B, aggiungere WHERE B.id IS NOT NULL tende a trasformare il risultato in:',['Qualcosa di equivalente a un INNER JOIN per quella condizione','Un FULL OUTER JOIN','Un CROSS JOIN','Una divisione relazionale'],'Elimini le righe preservate dal LEFT JOIN che non avevano match a destra.'],
-  ['SQL','Infame','Quale ordine logico descrive meglio una SELECT con aggregazione?',['FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY','SELECT → FROM → HAVING → WHERE → GROUP BY','WHERE → SELECT → GROUP BY → FROM','GROUP BY → FROM → SELECT → WHERE'],'Non è l’ordine sintattico scritto, ma l’ordine logico di valutazione.'],
-  ['SQL','Difficile','COUNT(DISTINCT Colonna) conta:',['I valori distinti non nulli della colonna','Tutte le righe incluse quelle nulle','Solo duplicati','Solo chiavi primarie'],'DISTINCT elimina duplicati, COUNT(colonna) ignora NULL.'],
-  ['Anomalie','Media','Cancellando l’ultimo studente di un corso perdo anche il nome del corso. È un’anomalia di:',['Cancellazione','Inserimento','Proiezione','Isolamento'],'La cancellazione di una riga distrugge anche informazioni che dovevano restare.'],
-  ['Anomalie','Difficile','Ripetere in molte righe il nome del docente associato allo stesso corso espone soprattutto a:',['Anomalia di modifica','Divisione relazionale','Outer join','Indipendenza fisica'],'Se il nome cambia, devi aggiornarlo in più punti, rischiando inconsistenza.']
-];
-
-const RAW_EVENTS = [
-  ['Bonus','Facile','Bonus: ORDER BY serve a...',['Ordinare il risultato finale','Filtrare gruppi','Creare indici','Imporre 3FN']],
-  ['Bonus','Media','Bonus: una N:M si traduce con...',['Tabella ponte','Colonna booleana','Indice','Vista obbligatoria']],
-  ['Bonus','Difficile','Bonus: COUNT(DISTINCT X) conta...',['Valori distinti non nulli','Tutte le righe','Solo NULL','Solo duplicati']],
-  ['Bonus','Infame','Bonus: A → B e B → A rendono A superchiave di R(A,B,C)?',['No, manca C','Sì sempre','Solo se A è numerico','Solo se C è NULL']],
-  ['Malus','Facile','Panic: chi filtra gruppi aggregati?',['HAVING','WHERE','FROM','ORDER BY']],
-  ['Malus','Media','Panic: COUNT(colonna) ignora...',['NULL','Tutte le righe','I duplicati sempre','I numeri']],
-  ['Malus','Difficile','Malus: WHERE COUNT(*) > 1 è sbagliato perché...',['WHERE arriva prima delle aggregazioni','COUNT non esiste','HAVING filtra righe singole','ORDER BY crea gruppi']],
-  ['Malus','Infame','Malus: natural join è rischioso perché...',['Usa automaticamente attributi con stesso nome','Non può usare condizioni','È sempre un full join','Ordina i risultati']]
-];
+import { RAW_QUESTIONS, RAW_EVENTS } from './questions';
 
 const TOTAL = 30;
 const START_HP = 100;
@@ -60,7 +11,7 @@ const CONFIG = {
 };
 
 const QUESTIONS = RAW_QUESTIONS.map(([tag, difficulty, text, options, explanation]) => ({ tag, difficulty, text, options, answer: 0, explanation }));
-const EVENTS = RAW_EVENTS.map(([eventType, difficulty, text, options]) => ({ eventType, difficulty, text, options, answer: 0 }));
+const EVENTS = RAW_EVENTS.map(([eventType, difficulty, text, options, explanation]) => ({ eventType, difficulty, text, options, answer: 0, explanation }));
 
 function shuffle(items) {
   const a = [...items];
@@ -176,6 +127,7 @@ export default function App() {
   const logSeq = useRef(1);
   const popupRef = useRef(null);
   const eventRef = useRef(null);
+  const boardRef = useRef(null);
   const q = run[index];
   const active = phase === 'play';
   const intensity = event ? 1 : hp < 30 ? 0.8 : combo >= 4 ? 0.55 : 0.25;
@@ -246,6 +198,7 @@ export default function App() {
   }, [q, selected, confirmed, popup, event]);
   useEffect(() => { if (popup) popupRef.current?.focus(); }, [popup]);
   useEffect(() => { if (event) eventRef.current?.focus(); }, [event]);
+  useEffect(() => { if (phase === 'play' && window.matchMedia('(max-width: 980px)').matches) boardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, [phase]);
 
   const pick = (n) => { if (!q || confirmed) return; setSelected(n); beep('pick'); };
   const confirm = () => {
@@ -274,7 +227,7 @@ export default function App() {
     const cfg = CONFIG[event?.difficulty] || CONFIG.Media;
     const good = event?.opts.find((o) => o.correct)?.text || '';
     setHp((h) => Math.max(0, h - cfg.hp)); setTime((t) => Math.max(0, t - cfg.time)); setScore((s) => Math.max(0, s - 25 - cfg.hp * 3)); setCombo(0); setMalus((m) => m + 1);
-    setPopup({ ok: false, title: `${event?.eventType || 'Evento'} fallito`, picked, correct: good, why: `La risposta corretta era: ${good}.`, impact: `-${cfg.hp} HP / -${cfg.time}s`, tag: event?.eventType || 'Evento', diff: event?.difficulty || 'Media', source: 'event' });
+    setPopup({ ok: false, title: `${event?.eventType || 'Evento'} fallito`, picked, correct: good, why: event?.explanation || `La risposta corretta era: ${good}.`, impact: `-${cfg.hp} HP / -${cfg.time}s`, tag: event?.eventType || 'Evento', diff: event?.difficulty || 'Media', source: 'event' });
     setEvent(null); beep('bad'); log(`☠ ${reason}: -${cfg.hp} HP / -${cfg.time}s`);
   };
   const answerEvent = (n) => {
@@ -284,7 +237,7 @@ export default function App() {
     const gain = 75 + cfg.base * 2 + combo * 8;
     setScore((s) => s + gain); beep('ok'); log(`⚡ ${event.eventType} superato: +${gain}`);
     if (event.eventType === 'Bonus') heal(cfg.heal, `Bonus ${event.difficulty}`);
-    setPopup({ ok: true, title: `${event.eventType} superato`, picked: opt.text, correct: opt.text, why: `Risposta corretta sull’evento: ${event.text}`, impact: `+${gain} punti`, tag: event.eventType, diff: event.difficulty, source: 'event' });
+    setPopup({ ok: true, title: `${event.eventType} superato`, picked: opt.text, correct: opt.text, why: event.explanation, impact: `+${gain} punti`, tag: event.eventType, diff: event.difficulty, source: 'event' });
     setEvent(null);
   };
 
@@ -292,9 +245,9 @@ export default function App() {
 
   return <div className="app"><Background intensity={intensity} /><div className="scan" aria-hidden="true" />
     <main className="shell">
-      <header className="top card"><div><p className="eyebrow">Sfida a tempo</p><h1>Maturità DBMS: Chaos Mode</h1></div><div className="actions"><button type="button" aria-pressed={sound} onClick={() => setSound(!sound)}>{sound ? 'Audio ON' : 'Audio OFF'}</button><button type="button" className="primary" onClick={start}>{phase === 'intro' ? 'Inizia' : 'Ricomincia'}</button></div></header>
+      <header className="top card"><div><p className="eyebrow">Sfida a tempo</p><h1>DB Survivor</h1></div><div className="actions"><button type="button" aria-pressed={sound} onClick={() => setSound(!sound)}>{sound ? 'Audio ON' : 'Audio OFF'}</button><button type="button" className="primary" onClick={start}>{phase === 'intro' ? 'Inizia' : 'Ricomincia'}</button></div></header>
       <section className="hud"><Stat label="Integrità" value={`${hp} HP`} pct={hp} /><Stat label="Tempo" value={formatTime(time)} pct={(time / maxTime) * 100} /><Stat label="Score" value={score} sub={`Combo ×${combo}`} /><Stat label="Domande" value={`${run.length ? index + 1 : 0}/${TOTAL}`} sub={`OK ${correct} · Malus ${malus} · Bonus ${bonus}`} /></section>
-      <section className="grid"><article className="card board">
+      <section className="grid"><article className="card board" ref={boardRef}>
         {phase === 'intro' && <div className="intro"><h2>Rispondi, sopravvivi, non farti fregare.</h2><p>{TOTAL} domande di difficoltà crescente. Rispondi, gestisci HP e tempo, e occhio agli eventi a sorpresa.</p><button type="button" className="primary big" onClick={start}>Inizia</button></div>}
         {phase === 'play' && q && <><div className="meta"><span>{q.tag}</span><span>{q.difficulty}</span></div><div className="question-box"><h2 className={qClass(q.text)}>{q.text}</h2></div><div className="answers">{q.opts.map((o, n) => <button type="button" key={o.text} disabled={confirmed || !!event} onClick={() => pick(n)} className={(confirmed ? o.correct ? 'ok' : selected === n ? 'bad' : 'dim' : selected === n ? 'sel' : '') + ' answer'}><b>{n + 1}</b><span>{o.text}</span></button>)}</div><div className="hint">{selected === null ? 'Scegli una risposta: tocca o usa i tasti 1-4. Puoi cambiare finché non confermi.' : confirmed ? 'Risultato nel popup, il tempo è in pausa.' : 'Risposta scelta. Conferma per procedere.'}</div><button type="button" className="primary next" disabled={selected === null || !!event} onClick={next}>{selected === null ? 'Scegli' : confirmed ? 'Vedi esito' : 'Conferma'}</button></>}
         {phase === 'end' && <div className="end"><h2>{rank}</h2><div className="summary"><Stat label="Score" value={score} /><Stat label="Corrette" value={correct} /><Stat label="Malus" value={malus} /><Stat label="Bonus" value={bonus} /></div><h3>Errori da ripassare</h3>{mistakes.length ? mistakes.slice(0, 8).map((m, x) => <div className="mistake" key={m.q}><b>{x + 1}. {m.q}</b><p>Corretta: {m.a}</p><small>{m.e}</small></div>) : <p className="good">Nessun errore principale. Mostruoso.</p>}<button type="button" className="primary big" onClick={start}>Nuova partita</button></div>}
