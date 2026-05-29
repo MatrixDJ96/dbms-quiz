@@ -50,7 +50,7 @@ const RAW_EVENTS = [
   ['Malus','Infame','Malus: natural join è rischioso perché...',['Usa automaticamente attributi con stesso nome','Non può usare condizioni','È sempre un full join','Ordina i risultati']]
 ];
 
-const TOTAL = 25;
+const TOTAL = 30;
 const START_HP = 100;
 const CONFIG = {
   Facile: { base: 16, event: 10, hp: 4, time: 3, heal: 5 },
@@ -89,7 +89,7 @@ function hydrate(q) {
   return { ...q, opts, read: readingSeconds(q), budget: budgetSeconds(q), wordTotal: wordCount(`${q.text} ${q.options.join(' ')}`), cx: complexity(q) };
 }
 function makeRun() {
-  const plan = { Facile: 4, Media: 7, Difficile: 9, Infame: 5 };
+  const plan = { Facile: 6, Media: 7, Difficile: 9, Infame: 8 };
   return shuffle(Object.entries(plan).flatMap(([d, n]) => shuffle(QUESTIONS.filter((q) => q.difficulty === d)).slice(0, n))).slice(0, TOTAL).map(hydrate);
 }
 function formatTime(s) {
@@ -292,7 +292,7 @@ export default function App() {
 
   return <div className="app"><Background intensity={intensity} /><div className="scan" aria-hidden="true" />
     <main className="shell">
-      <header className="top card"><div><p className="eyebrow">Quiz di maturità · DBMS</p><h1>Maturità DBMS: Chaos Mode</h1></div><div className="actions"><button type="button" aria-pressed={sound} onClick={() => setSound(!sound)}>{sound ? 'Audio ON' : 'Audio OFF'}</button><button type="button" className="primary" onClick={start}>{phase === 'intro' ? 'Inizia' : 'Ricomincia'}</button></div></header>
+      <header className="top card"><div><p className="eyebrow">Sfida a tempo</p><h1>Maturità DBMS: Chaos Mode</h1></div><div className="actions"><button type="button" aria-pressed={sound} onClick={() => setSound(!sound)}>{sound ? 'Audio ON' : 'Audio OFF'}</button><button type="button" className="primary" onClick={start}>{phase === 'intro' ? 'Inizia' : 'Ricomincia'}</button></div></header>
       <section className="hud"><Stat label="Integrità" value={`${hp} HP`} pct={hp} /><Stat label="Tempo" value={formatTime(time)} pct={(time / maxTime) * 100} /><Stat label="Score" value={score} sub={`Combo ×${combo}`} /><Stat label="Domande" value={`${run.length ? index + 1 : 0}/${TOTAL}`} sub={`OK ${correct} · Malus ${malus} · Bonus ${bonus}`} /></section>
       <section className="grid"><article className="card board">
         {phase === 'intro' && <div className="intro"><h2>Rispondi, sopravvivi, non farti fregare.</h2><p>{TOTAL} domande di difficoltà crescente. Rispondi, gestisci HP e tempo, e occhio agli eventi a sorpresa.</p><button type="button" className="primary big" onClick={start}>Inizia</button></div>}

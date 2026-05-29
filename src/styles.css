@@ -190,9 +190,30 @@ aside { display: grid; gap: var(--gap); align-content: start; }
 .modal-top { display: flex; justify-content: space-between; gap: 14px; align-items: center; margin-bottom: 14px; }
 .modal-top b { color: var(--warn); font-size: 28px; }
 
-.result.right { border-color: rgba(134, 239, 172, .45); }
-.result.wrong { border-color: rgba(251, 113, 133, .55); }
-.result h2 { font-size: clamp(1.45rem, 4vw, 2.15rem); margin: .4rem 0; }
+.result h2 { font-size: clamp(1.45rem, 4vw, 2.15rem); margin: .4rem 0; display: flex; align-items: center; gap: 10px; }
+.result h2::before { font-size: .9em; line-height: 1; font-weight: 900; }
+
+/* Esito GIUSTO → verde */
+.result.right {
+  border-color: var(--good);
+  background: linear-gradient(rgba(34, 197, 94, .16), rgba(34, 197, 94, .04)), var(--panel-solid);
+  box-shadow: var(--shadow-modal), 0 0 44px rgba(34, 197, 94, .2);
+}
+.result.right h2 { color: var(--good-text); }
+.result.right h2::before { content: "✓"; color: var(--good); }
+.result.right .modal-top span { border-color: rgba(134, 239, 172, .45); background: var(--good-bg); color: var(--good); }
+.result.right .modal-top b { color: var(--good); }
+
+/* Esito SBAGLIATO → rosso */
+.result.wrong {
+  border-color: var(--bad);
+  background: linear-gradient(rgba(244, 63, 94, .16), rgba(244, 63, 94, .04)), var(--panel-solid);
+  box-shadow: var(--shadow-modal), 0 0 44px rgba(244, 63, 94, .2);
+}
+.result.wrong h2 { color: #fecdd3; }
+.result.wrong h2::before { content: "✗"; color: var(--bad); }
+.result.wrong .modal-top span { border-color: rgba(251, 113, 133, .5); background: var(--bad-bg); color: var(--bad); }
+.result.wrong .modal-top b { color: var(--bad); }
 .result-grid { display: grid; gap: 10px; }
 .result-grid div { border: 1px solid var(--line-2); background: var(--fill-soft-2); border-radius: var(--r-lg); padding: 14px; }
 .result-grid small { color: var(--muted); text-transform: uppercase; letter-spacing: .14em; font-weight: 900; }
